@@ -182,7 +182,7 @@ printed = False
 def _s3_proxy_image(info: AlbumInfo) -> str:
     """
     use s3 to reupload the image so I'm not hitting discogs cdn all the time
-    https://github.com/seanbreckenridge/s3-image-server
+    https://github.com/purarue/s3-image-server
 
     If user doesnt have this configured/isnt installed,
     just return the url thats already there

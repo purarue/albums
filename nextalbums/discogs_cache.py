@@ -1,5 +1,5 @@
 """
-uses https://github.com/seanbreckenridge/url_cache to cache
+uses https://github.com/purarue/url_cache to cache
 discogs API data locally
 """
 

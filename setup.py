@@ -8,13 +8,12 @@ pkg = "nextalbums"
 if __name__ == "__main__":
     setup(
         name=pkg,
-        url="https://github.com/seanbreckenridge/albums",
+        url="https://github.com/purarue/albums",
         use_scm_version={
             "local_scheme": "dirty-tag",
         },
         zip_safe=False,
-        author="Sean Breckenridge",
-        author_email="seanbrecke@gmail.com",
+        author="purarue",
         description=("my personal album system"),
         license="MIT",
         packages=find_packages(include=[pkg]),

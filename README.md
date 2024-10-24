@@ -20,7 +20,7 @@ None of these sources are particularly perfect or complete, but they make me to 
 
 This contains code to interact with my [spreadsheet](https://sean.fish/s/albums) -- listing the next albums I should listen to, validating the data using the Discogs API
 
-An older version of this repo is pushed to [`albums_old`](https://github.com/seanbreckenridge/albums_old) -- became difficult to maintain due to size concerns/constantly syncing changes to giant SQL files. This maintains a request cache instead, using [`url_cache`](https://github.com/seanbreckenridge/url_cache)
+An older version of this repo is pushed to [`albums_old`](https://github.com/purarue/albums_old) -- became difficult to maintain due to size concerns/constantly syncing changes to giant SQL files. This maintains a request cache instead, using [`url_cache`](https://github.com/purarue/url_cache)
 
 ![](./.github/images/albums.png)
 
@@ -104,7 +104,7 @@ $ nextalbums print-next
 }
 ```
 
-I use that as part of my personal [HPI](https://github.com/seanbreckenridge/HPI-personal) modules, which lets me use its query interface:
+I use that as part of my personal [HPI](https://github.com/purarue/HPI-personal) modules, which lets me use its query interface:
 
 ```bash
 $ hpi query 'my.nextalbums.history' \
@@ -127,7 +127,7 @@ Note: The 'Rolling Stone's 500 Greatest of All Time' is a combination of the 201
 
 Configuration for this is handled by modifying the `settings.py` file in this directory. Since that is just a python file, you're free to modify that to pull items out of environment variables (`os.environ["ENVIRONMENT_VAR"]`) or read/files do anything else. You can run the file (`python3 settings.py`) to print the computed settings
 
-Note: To my knowledge, no one has ever done this yet, so if you have issues, feel free to open an [issue](https://github.com/seanbreckenridge/albums/issues/new)
+Note: To my knowledge, no one has ever done this yet, so if you have issues, feel free to open an [issue](https://github.com/purarue/albums/issues/new)
 
 1. Create your own copy of the [spreadsheet](https://docs.google.com/spreadsheets/d/12htSAMg67czl8cpkj1mX0TuAFvqL_PJLI4hv1arG5-M/edit#gid=1451660661).
 
@@ -135,7 +135,7 @@ Note: To my knowledge, no one has ever done this yet, so if you have issues, fee
 - I'd also recommend setting a fixed row height to ensure images are all the same size (You can do this by doing Ctrl/⌘ + A repeatedly till the margins are selected, and then resizing one row to your desired height.)
 - Name the sheet `Music` (near the bottom left)
 
-2. Clone this repository `git clone https://github.com/seanbreckenridge/albums`, and install it using `pip install --editable .`, installing it as an editable package. This **won't** work as normal `pip install`, it **must** be editable.
+2. Clone this repository `git clone https://github.com/purarue/albums`, and install it using `pip install --editable .`, installing it as an editable package. This **won't** work as normal `pip install`, it **must** be editable.
 3. Create a file named `client_secret.json` in the root directory which contains your credentials for a google sheets OAuth connection. [Instructions for how to get your `client_secret.json` file here](https://pygsheets.readthedocs.io/en/staging/authorization.html); download your created credentials from [the Google credentials console](https://console.developers.google.com/apis/credentials)
 4. Run `python3 setup_credentials.py` to authenticate this with the Google account you created the spreadsheet on
 5. Update the `SPREADSHEET_ID` variable in `settings.py` - the ID is after the `/d/` in the URL when viewing it in Google Sheets
