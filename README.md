@@ -18,7 +18,7 @@ This started by me merging a bunch of lists of music to listen to:
 
 None of these sources are particularly perfect or complete, but they make me to listen to some music I otherwise may have not given a chance. Only see it as slightly better than what I used to do in the past, i.e. scrolling through streaming services and picking whatever they happen to have featured. (Edit: as of now, am pretty comfortable using charts/recommendation lists to find things I'm more likely to be interested in, so will likely not update the Grammy/Mercury/AMA/Brit Awards from 2023 going forward, because I find my judgement for new music to be (slightly) better than what the award shows pick)
 
-This contains code to interact with my [spreadsheet](https://sean.fish/s/albums) -- listing the next albums I should listen to, validating the data using the Discogs API
+This contains code to interact with my [spreadsheet](https://purarue.xyz/s/albums) -- listing the next albums I should listen to, validating the data using the Discogs API
 
 An older version of this repo is pushed to [`albums_old`](https://github.com/purarue/albums_old) -- became difficult to maintain due to size concerns/constantly syncing changes to giant SQL files. This maintains a request cache instead, using [`url_cache`](https://github.com/purarue/url_cache)
 
@@ -48,7 +48,7 @@ Commands:
 
 Three of those commands are related to updating the data files here:
 
-- `nextalbums discogs-update` uses the [Discogs API](https://github.com/discogs/discogs_client) to fetch metadata and validate the data on [the spreadsheet](https://sean.fish/s/albums)
+- `nextalbums discogs-update` uses the [Discogs API](https://github.com/discogs/discogs_client) to fetch metadata and validate the data on [the spreadsheet](https://purarue.xyz/s/albums)
 - `nextalbums generate-csv` updates the [`spreadsheet.csv`](./spreadsheet.csv) file
 - `nextalbums update-csv-datafiles` updates the files in [`csv_data`](./csv_data)
 
