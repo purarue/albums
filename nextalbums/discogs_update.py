@@ -184,8 +184,8 @@ def _s3_proxy_image(info: AlbumInfo) -> str:
     use s3 to reupload the image so I'm not hitting discogs cdn all the time
     https://github.com/purarue/s3-image-server
 
-    If user doesnt have this configured/isnt installed,
-    just return the url thats already there
+    If user doesn't have this configured/isn't installed,
+    just return the url that's already there
     """
     if "USE_S3_URL" not in os.environ:
         return info.album_artwork
@@ -306,7 +306,7 @@ def updates(values: WorksheetData, resolve: bool) -> WorksheetData:
         if info.has_discogs_link():
             if info.discogs_url not in all_links:
                 all_links.add(info.discogs_url)
-            else:  # exit if theres a duplicate discogs link (meaning duplicate entry)
+            else:  # exit if there's a duplicate discogs link (meaning duplicate entry)
                 eprint(f"Found duplicate of {info.discogs_url}. Exiting...")
                 break
 

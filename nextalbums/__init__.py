@@ -2,7 +2,7 @@ import sys
 from os import path
 
 # !!!!!!!!!!!!!!!!!!!!!!!!
-# THIS CANT BE INSTALLED AS A REGULAR PACKAGE
+# THIS CAN'T BE INSTALLED AS A REGULAR PACKAGE
 # since this acts on data files that I'd rather keep part of this
 # package, it has to be installed as an editable package
 # like:

@@ -20,7 +20,7 @@ DATE_REGEX = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
 
 class Album(NamedTuple):
     score: Optional[float]
-    note: Optional[Note]  # .e.g some reason I couldn't listen to an album, cant find it
+    note: Optional[Note]  # .e.g some reason I couldn't listen to an album, can't find it
     listened_on: Optional[date]
     album_name: str
     album_artwork_url: str
@@ -148,12 +148,12 @@ class Album(NamedTuple):
         return date(year=self.year, month=1, day=1)
 
 
-SEPERATORS = {";", "|"}
+SEPARATORS = {";", "|"}
 
 
 def _split_separated(data: str) -> List[str]:
     parts: List[str] = []
-    for sep in SEPERATORS:
+    for sep in SEPARATORS:
         if sep in data:
             for part in data.split(sep):
                 if ps := part.strip():
@@ -169,7 +169,7 @@ def _split_separated(data: str) -> List[str]:
 # the same data as get_values with the below parameters
 # this is so that I have the option to cache the response
 # from the get_values function elsewhere, so this
-# doen't have to make the API call every time
+# doesn't have to make the API call every time
 def export_data(
     data_source: Optional[WorksheetData] = None,
     remove_header: bool = True,
@@ -187,7 +187,7 @@ def export_data(
     if remove_header:
         worksheet_vals = worksheet_vals[1:]
     for vals in worksheet_vals:
-        # pad list incase there are missing values
+        # pad list in case there are missing values
         while len(vals) < 11:
             vals.append("")
         # destructure row
@@ -209,7 +209,7 @@ def export_data(
         try:
             fscore = float(score)
         except ValueError:
-            # couldn't parse, probably havent listened to this yet
+            # couldn't parse, probably haven't listened to this yet
             # edge case, where I can't find an album online
             if score in DROPPED:
                 note = score

@@ -8,7 +8,7 @@ from oauth2client.file import Storage  # type: ignore[import]
 
 from settings import CLIENT_SECRET_FILE, CREDENTIALS_PATH
 
-# probably wont ever be changed, no point in putting them in settings.py?
+# probably won't ever be changed, no point in putting them in settings.py?
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/sheets.googleapis.com-python-nextalbums.json
 SCOPES = "https://www.googleapis.com/auth/spreadsheets"
