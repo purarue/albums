@@ -16,6 +16,14 @@ except ImportError:
 
 this_dir = os.path.abspath(os.path.dirname(__file__))
 
+IMAGE_DATA = os.environ.get(
+    "ALBUMS_IMAGE_DATA",
+    os.path.join(
+        os.environ.get("XDG_DOCUMENTS_DIR", os.path.expanduser("~/.local/share")),
+        "image_data.json",
+    ),
+)
+
 BASE_SPREADSHEETS_CSV_FILE = os.path.join(this_dir, "spreadsheet.csv")
 
 SPREADSHEET_ID = "12htSAMg67czl8cpkj1mX0TuAFvqL_PJLI4hv1arG5-M"

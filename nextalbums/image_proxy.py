@@ -27,27 +27,27 @@ client = boto3.client(
 
 AUTO_DUMP = True
 
-image_data = os.path.join(SETTINGS.this_dir, "image_data.json")
+image_data_file = SETTINGS.IMAGE_DATA
 
 
 def setup_db() -> pickledb.PickleDB:
-    backup = f"{image_data}.bak"
+    backup = f"{image_data_file}.bak"
     try:
-        pdb = pickledb.load(image_data, auto_dump=AUTO_DUMP)
+        pdb = pickledb.load(image_data_file, auto_dump=AUTO_DUMP)
     except Exception:
         assert Path(backup).exists()
         eprint(
-            f"image_proxy: failed to load {image_data}, restoring from backup", err=True
+            f"image_proxy: failed to load {image_data_file}, restoring from backup", err=True
         )
-        shutil.copy(backup, image_data)
-        pdb = pickledb.load(image_data, auto_dump=AUTO_DUMP)
+        shutil.copy(backup, image_data_file)
+        pdb = pickledb.load(image_data_file, auto_dump=AUTO_DUMP)
 
     Path(backup).write_text(json.dumps(pdb.db))
 
     if not AUTO_DUMP:
         atexit.register(lambda: cast(object, pdb.dump()))
 
-    eprint(f"image_proxy: loaded {len(pdb.db)} entries from {image_data} {AUTO_DUMP=} ")
+    eprint(f"image_proxy: loaded {len(pdb.db)} entries from {image_data_file} {AUTO_DUMP=} ")
     return pdb
 
 
