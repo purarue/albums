@@ -1,9 +1,11 @@
 from __future__ import annotations
 import os
 from datetime import date, datetime
-from typing import TYPE_CHECKING, Optional, Union, Literal
+from typing import TYPE_CHECKING, Optional, Union, get_args, Literal
 
 import click
+
+from nextalbums.common import CustomReason
 
 from . import SETTINGS
 from .common import eprint
@@ -147,6 +149,7 @@ today = str(date.today())
 @click.option(
     "-d",
     "--date",
+    "_dateval",
     type=str,
     default=today,
     show_default=True,
@@ -167,17 +170,17 @@ today = str(date.today())
     prompt=True,
     help="Score to give album",
 )
-def mark_listened(album: Album, score: float, date: str) -> None:
+def mark_listened(album: Album, score: float, _dateval: str) -> None:
     assert 0 <= score <= 10, "Score must be between 0 and 10"
     # parse date to a datetime
     from .discogs_update import mark_listened
 
     dt: Union[date, Literal["no-edit"]]
     try:
-        dt = datetime.strptime(date, "%Y-%m-%d")
+        dt = datetime.strptime(_dateval, "%Y-%m-%d").date()
     except ValueError:
         if date == "no-edit":
-            dt = date
+            dt = "no-edit"
         else:
             raise click.BadParameter("Date must be in YYYY-MM-DD format")
 
@@ -185,13 +188,22 @@ def mark_listened(album: Album, score: float, date: str) -> None:
 
     worksheet_vals = get_values(sheetRange="Music!A:K", valueRenderOption="FORMULA")
     mark_listened(
-        album, worksheet_vals, score=score, listened_on=dt if dt != "no-edit" else None
+        album,
+        worksheet_vals,
+        score=score,
+        listened_on=dt if isinstance(dt, date) else None,
     )
 
 
 @main.command(short_help="add new album")
+@click.option(
+    "--reason",
+    type=click.Choice(get_args(CustomReason)),
+    default="Manual",
+    help="Reason for adding",
+)
 @click.argument("DISCOGS_URL")
-def add_album(discogs_url: str) -> None:
+def add_album(discogs_url: str, reason: CustomReason) -> None:
     """
     This *just* adds the URL to the spreadsheet, you'll need to run
     nextalbums discogs-update to actually update the sheet with the data
@@ -203,7 +215,7 @@ def add_album(discogs_url: str) -> None:
     if fixed_url != discogs_url:
         eprint(f"Resolved {discogs_url} to {fixed_url}")
 
-    add_album(fixed_url)
+    add_album(fixed_url, reason)
 
 
 @main.command(short_help="override image upload")
