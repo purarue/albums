@@ -1,11 +1,13 @@
 import re
 
+from typing import Literal
 from urllib.parse import urlparse
 from functools import partial
 from typing import Any, List, Tuple
 
 import click
 
+CustomReason = Literal["Manual", "Relation", "Recommendation"]
 WorksheetValue = Any
 WorksheetRow = List[WorksheetValue]
 WorksheetData = List[WorksheetRow]

@@ -5,7 +5,16 @@ import string
 from datetime import date
 from dataclasses import dataclass, replace
 from urllib.parse import urlparse
-from typing import List, Any, Set, Dict, Optional, Union, Sequence, TYPE_CHECKING
+from typing import (
+    List,
+    Any,
+    Set,
+    Dict,
+    Optional,
+    Union,
+    Sequence,
+    TYPE_CHECKING,
+)
 from time import sleep
 
 import click
@@ -16,7 +25,7 @@ from googleapiclient import discovery  # type: ignore[import]
 
 from . import SETTINGS
 from .core_gsheets import get_credentials, get_values
-from .common import WorksheetData, WorksheetRow, eprint
+from .common import CustomReason, WorksheetData, WorksheetRow, eprint
 from .discogs_cache import fetch_discogs, backoff_hdlr, discogsClient
 from .export import export_data, Album, _split_separated
 
@@ -430,7 +439,7 @@ def mark_listened(
     request.execute()
 
 
-def add_album(discogs_url: str, reason: str = "Manual") -> None:
+def add_album(discogs_url: str, reason: CustomReason) -> None:
     """
     adds a new album to the spreadsheet
 
