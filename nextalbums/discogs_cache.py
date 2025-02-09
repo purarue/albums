@@ -81,7 +81,7 @@ def discogs_urlcache() -> DiscogsCache:
     cache_dir_path = os.environ.get("DISCOGS_CACHE_DIR", cache_dir)
     # refresh data every 6 weeks
     return DiscogsCache(
-        cache_dir=cache_dir_path, sleep_time=1, options={"expiry_duration": "32w"}
+        cache_dir=cache_dir_path, sleep_time=1, options={"expiry_duration": "64w"}
     )
 
 
