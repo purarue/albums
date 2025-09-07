@@ -1,28 +1,59 @@
 [project]
+name = "nextalbums"
+version = "0.1.0"
+description = "my personal album system"
+license = "MIT"
 license-files = ["LICENSE"]
-[[project.authors]]
-name = ""
+authors = [{ name = "purarue" }]
+urls = { Homepage = "https://github.com/purarue/albums" }
+requires-python = ">=3.10"
+dependencies = [
+  "PyYAML>=5.1.2",
+  "google-api-python-client>=1.7.11",
+  "prettytable>=0.7.2",
+  "oauth2client>=4.1.3",
+  "python3-discogs-client>=2.7.0",
+  "xlrd>=1.2.0",
+  "click>=7.0",
+  "simplejson",
+  "backoff",
+  "url_cache>=0.0.5",
+  "more_itertools",
+  "httpx",
+  "boto3",
+  "pickledb",
+  "pyfzf_iter",
+]
+
+[project.scripts]
+nextalbums = "nextalbums.__main__:main"
 
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=61", "setuptools_scm"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.packages.find]
+include = ["nextalbums"]
+exclude = []
+
+[tool.setuptools.package-data]
+nextalbums = ["py.typed"]
+
+[tool.setuptools_scm]
+local_scheme = "dirty-tag"
+
 [tool.mypy]
-pretty = "True"
-disallow_any_generics = "False"
-show_error_context = "True"
-show_error_codes = "True"
-namespace_packages = "True"
-disallow_subclassing_any = "True"
-disallow_incomplete_defs = "True"
-no_implicit_optional = "True"
-warn_redundant_casts = "True"
-warn_return_any = "True"
-warn_unreachable = "True"
+pretty = true
+disallow_any_generics = false
+show_error_context = true
+show_error_codes = true
+namespace_packages = true
+disallow_subclassing_any = true
+disallow_incomplete_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
 
 [tool.pytest.ini_options]
 addopts = []
-
-[tool.setuptools.packages.find]
-include = []
-exclude = []
