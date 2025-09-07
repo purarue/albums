@@ -1,0 +1,28 @@
+[project]
+license-files = ["LICENSE"]
+[[project.authors]]
+name = ""
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.mypy]
+pretty = "True"
+disallow_any_generics = "False"
+show_error_context = "True"
+show_error_codes = "True"
+namespace_packages = "True"
+disallow_subclassing_any = "True"
+disallow_incomplete_defs = "True"
+no_implicit_optional = "True"
+warn_redundant_casts = "True"
+warn_return_any = "True"
+warn_unreachable = "True"
+
+[tool.pytest.ini_options]
+addopts = []
+
+[tool.setuptools.packages.find]
+include = []
+exclude = []
