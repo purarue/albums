@@ -6,7 +6,7 @@ discogs API data locally
 import os
 import functools
 from functools import cache
-from typing import Any, Dict
+from typing import Any, override
 from datetime import datetime
 
 import requests
@@ -20,7 +20,7 @@ from . import SETTINGS
 from .common import eprint, parse_url_type
 
 
-def backoff_hdlr(details):
+def backoff_hdlr(details: Any):
     print(
         "Backing off {wait:0.1f} seconds afters {tries} tries "
         "calling function {target} with args {args} and kwargs "
@@ -41,7 +41,7 @@ def discogsClient() -> discogs_client.Client:
     max_tries=5,
     on_backoff=backoff_hdlr,
 )
-def discogs_get(_type: str, _id: int, /) -> Dict[str, Any]:
+def discogs_get(_type: str, _id: int, /) -> dict[str, Any]:
     """Gets data from discogs API."""
     eprint(f"[Discogs] Requesting {_type} {_id}")
     if _type == "master":  # if Master
@@ -60,7 +60,8 @@ class DiscogsCache(URLCache):
     Subclass URLCache to handle caching the Summary data to a local directory cache
     """
 
-    def request_data(self, url: str) -> Summary:  # type: ignore[override]
+    @override
+    def request_data(self, url: str, preprocess_url: bool = False) -> Summary:  # type: ignore[override]
         """
         Override the request data function to fetch from the discogs API
         """
@@ -68,7 +69,10 @@ class DiscogsCache(URLCache):
         uurl = self.preprocess_url(url)
         assert uurl.strip(), f"No url: '{url}'"
         _type, _id = parse_url_type(uurl)
-        data = discogs_get(_type, int(_id))
+        try:
+            data = discogs_get(_type, int(_id))
+        except HTTPError as e:
+            raise RuntimeError(f"Discogs {_type} {_id} not found (404)") from e
         assert len(data.keys()) > 3, str(data)
         # raises before it returns summary which would then get saved by 'URLCache.get'
         return Summary(url=uurl, data={}, metadata=data, timestamp=datetime.now())
@@ -90,7 +94,7 @@ def _fetch_discogs(url: str, refresh: bool = False) -> Summary:
     if refresh:
         uurl = uc.preprocess_url(url)
         data = uc.request_data(uurl)
-        uc.summary_cache.put(uurl, data)
+        _ = uc.summary_cache.put(uurl, data)
     else:
         data = uc.get(url)
     _type, _id = parse_url_type(url)
@@ -102,7 +106,7 @@ def _fetch_discogs(url: str, refresh: bool = False) -> Summary:
         )
         if not uc.summary_cache.has(main_release_url):
             eprint(f"[Discogs] Requesting main release for {_id}")
-        uc.get(main_release_url)
+        _ = uc.get(main_release_url)
     return data
 
 
