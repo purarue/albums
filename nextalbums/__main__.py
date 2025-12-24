@@ -179,7 +179,7 @@ def mark_listened(album: Album, score: float, _dateval: str) -> None:
     try:
         dt = datetime.strptime(_dateval, "%Y-%m-%d").date()
     except ValueError:
-        if date == "no-edit":
+        if _dateval == "no-edit":
             dt = "no-edit"
         else:
             raise click.BadParameter("Date must be in YYYY-MM-DD format")
