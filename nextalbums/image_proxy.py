@@ -25,29 +25,26 @@ client = boto3.client(
     aws_secret_access_key=os.environ["S3_SECRET_KEY"],
 )
 
-AUTO_DUMP = True
-
 image_data_file = SETTINGS.IMAGE_DATA
 
 
 def setup_db() -> pickledb.PickleDB:
     backup = f"{image_data_file}.bak"
     try:
-        pdb = pickledb.load(image_data_file, auto_dump=AUTO_DUMP)
+        pdb = pickledb.PickleDB(image_data_file)
+        pdb.load()
     except Exception:
         assert Path(backup).exists()
         eprint(
-            f"image_proxy: failed to load {image_data_file}, restoring from backup", err=True
+            f"image_proxy: failed to load {image_data_file}, restoring from backup",
+            err=True,
         )
         shutil.copy(backup, image_data_file)
-        pdb = pickledb.load(image_data_file, auto_dump=AUTO_DUMP)
+        pdb = pickledb.PickleDB(image_data_file).load()
 
     Path(backup).write_text(json.dumps(pdb.db))
 
-    if not AUTO_DUMP:
-        atexit.register(lambda: cast(object, pdb.dump()))
-
-    eprint(f"image_proxy: loaded {len(pdb.db)} entries from {image_data_file} {AUTO_DUMP=} ")
+    eprint(f"image_proxy: loaded {len(pdb.db)} entries from {image_data_file}")
     return pdb
 
 
@@ -108,8 +105,7 @@ def proxy_image(
     url: str, album_id: str, discogs_url: str, retry: bool = True
 ) -> str | None:
     db = image_db()
-    if db.exists(album_id):
-        resp = db.get(album_id)
+    if resp := db.get(album_id):
         if resp == 404:
             return None
         assert isinstance(resp, str)

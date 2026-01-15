@@ -21,7 +21,9 @@ import click
 import backoff  # type: ignore[import]
 import httplib2  # type: ignore[import]
 from more_itertools import unique_everseen
-from googleapiclient import discovery  # type: ignore[import]
+from googleapiclient import discovery
+
+from nextalbums.image_proxy import image_db
 
 from . import SETTINGS
 from .core_gsheets import get_credentials, get_values
@@ -133,7 +135,7 @@ def _fix_artist_name(artist_name: str) -> str:
 
 
 def _artist_ids(artists: List[Dict[str, Any]]) -> str:
-    artist_ids = [str(a["id"]) for a in artists if int(a["id"]) != 0]
+    artist_ids = [str(a["id"]) for a in artists if int(a.get("id", 0) or 0) != 0]
     return "; ".join(artist_ids)
 
 
@@ -213,6 +215,10 @@ def _s3_proxy_image(info: AlbumInfo) -> str:
 
     img_url = remove_image_formula(info.album_artwork)
     proxied = proxy_image(img_url, info.slugify_hash(), info.discogs_url)
+
+    db = image_db()
+    db.save()
+
     if proxied is None:
         return info.album_artwork
     return _add_image_formula(proxied)
