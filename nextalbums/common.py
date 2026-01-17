@@ -3,21 +3,21 @@ import re
 from typing import Literal
 from urllib.parse import urlparse
 from functools import partial
-from typing import Any, List, Tuple
+from typing import Any
 
 import click
 
 CustomReason = Literal["Manual", "Relation", "Recommendation"]
 WorksheetValue = Any
-WorksheetRow = List[WorksheetValue]
-WorksheetData = List[WorksheetRow]
+WorksheetRow = list[WorksheetValue]
+WorksheetData = list[WorksheetRow]
 
 eprint = partial(click.echo, err=True)
 
 
 # Items which are on my spreadsheet because I added it
 # not because they won a award/were on a list etc.
-PERSONAL = set(["manual", "relation", "recommendation"])
+PERSONAL = {"manual", "relation", "recommendation"}
 
 
 def _is_personal(data: str) -> bool:
@@ -35,7 +35,7 @@ def filter_personal_reasons(
     return [row for row in values if not _is_personal(row[5])]
 
 
-def parse_url_type(uurl: str) -> Tuple[str, int]:
+def parse_url_type(uurl: str) -> tuple[str, int]:
     _type, _id = urlparse(uurl).path.strip("/").split("/")
     assert _type in {"master", "release"}, str(uurl)
     assert str(_id).isdigit(), str(uurl)

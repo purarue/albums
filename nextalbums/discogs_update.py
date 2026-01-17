@@ -6,15 +6,11 @@ from datetime import date
 from dataclasses import dataclass, replace
 from urllib.parse import urlparse
 from typing import (
-    List,
     Any,
-    Set,
-    Dict,
-    Optional,
     Union,
-    Sequence,
     TYPE_CHECKING,
 )
+from collections.abc import Sequence
 from time import sleep
 
 import click
@@ -83,7 +79,7 @@ class AlbumInfo:
     styles: str
 
     @classmethod
-    def from_row(cls, row: WorksheetRow) -> "AlbumInfo":
+    def from_row(cls, row: WorksheetRow) -> AlbumInfo:
         strd = [
             str(c) for c in _pad_data(row, len(list(AlbumInfo.__annotations__.keys())))
         ]
@@ -92,9 +88,9 @@ class AlbumInfo:
     def has_discogs_link(self) -> bool:
         return bool(self.discogs_url.strip())
 
-    def to_row(self) -> List[str]:
+    def to_row(self) -> list[str]:
         fields = list(AlbumInfo.__annotations__.keys())
-        vals: List[str] = []
+        vals: list[str] = []
         for f in fields:
             vals.append(getattr(self, f))
         assert len(vals) == 11, str(vals)
@@ -108,7 +104,7 @@ def _fix_discogs_link(link: str, resolve: bool) -> str:
     """Removes unnecessary parts of Discogs URLs"""
     urlparse_path = urlparse(link).path
     if master_id := re.search(r"\/master\/(?:view\/)?(\d+)", urlparse_path):
-        return "https://www.discogs.com/master/{}".format(master_id.groups()[0])
+        return f"https://www.discogs.com/master/{master_id.groups()[0]}"
     else:  # if there is no master id
         if release_id := re.search(r"\/release\/(?:view\/)?(\d+)", urlparse_path):
             if resolve:
@@ -120,7 +116,7 @@ def _fix_discogs_link(link: str, resolve: bool) -> str:
                     eprint(f"Resolved release {release_match} to {rel.master.id}.")
                     return f"https://www.discogs.com/master/{rel.master.id}"
                 else:
-                    return "https://www.discogs.com/release/{}".format(release_match)
+                    return f"https://www.discogs.com/release/{release_match}"
             else:
                 return f"https://www.discogs.com/release/{release_id.groups()[0]}"
         else:
@@ -134,7 +130,7 @@ def _fix_artist_name(artist_name: str) -> str:
     return str(re.sub(ARTIST_NAME_REGEX, "", artist_name)).strip()
 
 
-def _artist_ids(artists: List[Dict[str, Any]]) -> str:
+def _artist_ids(artists: list[dict[str, Any]]) -> str:
     artist_ids = [str(a["id"]) for a in artists if int(a.get("id", 0) or 0) != 0]
     return "; ".join(artist_ids)
 
@@ -167,7 +163,7 @@ TIME_DIGITS = set(string.digits + ":")
 
 def _escape_title(title: str) -> str:
     if set(title).issubset(TIME_DIGITS) or "'" in title:
-        return '=T("{}")'.format(title)
+        return f'=T("{title}")'
     return title
 
 
@@ -176,7 +172,7 @@ def _add_image_formula(img_url: str) -> str:
     return f'=IMAGE("{img_url}")'
 
 
-def _discogs_image(album: Album) -> Optional[str]:
+def _discogs_image(album: Album) -> str | None:
     for d in album.datas():
         if image_list := d.get("images"):
             assert isinstance(image_list, list)
@@ -230,7 +226,7 @@ def discogs_update_info(info: AlbumInfo, album: AlbumOrErr) -> AlbumInfo:
     new_info = replace(info)  # copy dataclass
     link = info.discogs_url
     assert link.strip(), str(info)
-    metadata: Dict[str, Any] = fetch_discogs(link).metadata
+    metadata: dict[str, Any] = fetch_discogs(link).metadata
 
     assert "title" in metadata
     assert "artists" in metadata
@@ -241,7 +237,7 @@ def discogs_update_info(info: AlbumInfo, album: AlbumOrErr) -> AlbumInfo:
     new_info.main_artist_id = _artist_ids(metadata["artists"])
     new_info.artist = ", ".join(
         unique_everseen(
-            (_fix_artist_name(artist["name"]) for artist in metadata["artists"])
+            _fix_artist_name(artist["name"]) for artist in metadata["artists"]
         )
     )
 
@@ -279,7 +275,7 @@ def upkeep(info: AlbumInfo, album: AlbumOrErr) -> AlbumInfo:
     try:
         new_info.album_artwork = _s3_proxy_image(new_info)
     except Exception as e:
-        click.echo("Error uploading image to s3: {}".format(e), err=True)
+        click.echo(f"Error uploading image to s3: {e}", err=True)
 
     print_changes(info, new_info, ignore_fields=["album_artwork"])
     return new_info
@@ -299,9 +295,9 @@ def update_row(info: AlbumInfo, album: AlbumOrErr, *, resolve: bool) -> AlbumInf
 def updates(values: WorksheetData, resolve: bool) -> WorksheetData:
     """Error Handling, exits cleanly on exceptions."""
     header = values.pop(0)
-    all_links: Set[str] = set()
+    all_links: set[str] = set()
 
-    albums: List[AlbumOrErr] = list(
+    albums: list[AlbumOrErr] = list(
         export_data(data_source=values, remove_header=False)
     )
 
@@ -345,12 +341,12 @@ def update_values(values, credentials):
     update_data = [
         {
             # Album, Artist, Year
-            "range": "Music!B1:D{}".format(no_of_rows),
+            "range": f"Music!B1:D{no_of_rows}",
             "values": [_pad_data(vals[1:4], 3) for vals in values],
         },
         {
             # Reason, Album Artwork, Discogs Link, Artist ID(s), Genre, Style
-            "range": "Music!F1:K{}".format(no_of_rows),
+            "range": f"Music!F1:K{no_of_rows}",
             "values": [_pad_data(vals[5:], 6) for vals in values],
         },
     ]
@@ -391,7 +387,7 @@ def mark_listened(
     spreadsheet: WorksheetData,
     *,
     score: float,
-    listened_on: Optional[date] = None,
+    listened_on: date | None = None,
 ) -> None:
     """Marks the album as listened to on the spreadsheet"""
     change_index = None
@@ -497,12 +493,12 @@ def add_album(discogs_url: str, reason: CustomReason) -> None:
     update_data = [
         {
             # Discogs Link
-            "range": "Music!H{}".format(len(values) + 1),
+            "range": f"Music!H{len(values) + 1}",
             "values": [[discogs_url]],
         },
         {
             # Reason
-            "range": "Music!F{}".format(len(values) + 1),
+            "range": f"Music!F{len(values) + 1}",
             "values": [[reason]],
         },
     ]

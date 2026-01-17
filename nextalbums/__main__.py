@@ -1,7 +1,7 @@
 from __future__ import annotations
 import os
 from datetime import date, datetime
-from typing import TYPE_CHECKING, Optional, Union, get_args, Literal
+from typing import TYPE_CHECKING, get_args, Literal
 
 import click
 
@@ -114,7 +114,7 @@ def _export_data() -> list[Album]:
 
 
 def _handle_album_cli(
-    ctx: click.Context, param: click.Argument, value: Optional[str]
+    ctx: click.Context, param: click.Argument, value: str | None
 ) -> Album:
     from pyfzf import FzfPrompt
 
@@ -175,7 +175,7 @@ def mark_listened(album: Album, score: float, _dateval: str) -> None:
     # parse date to a datetime
     from .discogs_update import mark_listened
 
-    dt: Union[date, Literal["no-edit"]]
+    dt: date | Literal["no-edit"]
     try:
         dt = datetime.strptime(_dateval, "%Y-%m-%d").date()
     except ValueError:

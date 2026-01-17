@@ -31,7 +31,7 @@ DISCOGS_CREDS = {}
 
 discogs_data_file = os.path.join(this_dir, "discogs_token.yaml")
 if os.path.exists(discogs_data_file):
-    with open(discogs_data_file, "r") as f:
+    with open(discogs_data_file) as f:
         DISCOGS_CREDS = yaml.load(f, Loader=yaml.FullLoader)
 
 CLIENT_SECRET_FILE = os.path.join(this_dir, "client_secret.json")

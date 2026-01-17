@@ -4,14 +4,15 @@ import warnings
 from datetime import date, datetime
 from time import strptime
 from pathlib import Path
-from typing import NamedTuple, List, Iterator, Optional, Any, Dict, Union
+from typing import NamedTuple, Any
+from collections.abc import Iterator
 
 
 from .common import WorksheetData, eprint, parse_url_type
 
-DROPPED = set(["cant find", "nope"])
+DROPPED = {"cant find", "nope"}
 
-Json = Dict[str, Any]
+Json = dict[str, Any]
 
 Note = str
 
@@ -19,21 +20,21 @@ DATE_REGEX = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
 
 
 class Album(NamedTuple):
-    score: Optional[float]
-    note: Optional[Note]  # .e.g some reason I couldn't listen to an album, can't find it
-    listened_on: Optional[date]
+    score: float | None
+    note: Note | None  # .e.g some reason I couldn't listen to an album, can't find it
+    listened_on: date | None
     album_name: str
     album_artwork_url: str
     cover_artists: str
-    discogs_url: Optional[str]
+    discogs_url: str | None
     year: int
-    reasons: List[str]
-    genres: List[str]
-    styles: List[str]
-    main_artists: List[int]
+    reasons: list[str]
+    genres: list[str]
+    styles: list[str]
+    main_artists: list[int]
 
     @property
-    def dt(self) -> Optional[datetime]:
+    def dt(self) -> datetime | None:
         if self.listened_on:
             return datetime.combine(self.listened_on, datetime.min.time())
         else:
@@ -89,7 +90,7 @@ class Album(NamedTuple):
         except AssertionError:
             return False
 
-    def datas(self) -> List[Json]:
+    def datas(self) -> list[Json]:
         _datas = []
         if self.has_master():
             _datas.append(self.master())
@@ -98,7 +99,7 @@ class Album(NamedTuple):
         return _datas
 
     @staticmethod
-    def _parse_release_date(rel_raw: Union[str, int]) -> Optional[date]:
+    def _parse_release_date(rel_raw: str | int) -> date | None:
         if isinstance(rel_raw, int):
             rel_raw = str(rel_raw)
         assert isinstance(rel_raw, str), f"{rel_raw} {type(rel_raw)}"
@@ -106,7 +107,7 @@ class Album(NamedTuple):
             return date(year=int(rel_raw), month=1, day=1)
         else:
             if match := re.match(DATE_REGEX, rel_raw):
-                year, month, day = [int(g) for g in match.groups()]
+                year, month, day = (int(g) for g in match.groups())
                 # sometimes the month and day aren't specified, so
                 # default to 1
                 if day == 0:
@@ -117,7 +118,7 @@ class Album(NamedTuple):
         return None
 
     @staticmethod
-    def _traverse_release_dates(blob: Json) -> Optional[date]:
+    def _traverse_release_dates(blob: Json) -> date | None:
         if "release" in blob:
             if dt := Album._parse_release_date(blob["release"]):
                 return dt
@@ -151,8 +152,8 @@ class Album(NamedTuple):
 SEPARATORS = {";", "|"}
 
 
-def _split_separated(data: str) -> List[str]:
-    parts: List[str] = []
+def _split_separated(data: str) -> list[str]:
+    parts: list[str] = []
     for sep in SEPARATORS:
         if sep in data:
             for part in data.split(sep):
@@ -171,9 +172,9 @@ def _split_separated(data: str) -> List[str]:
 # from the get_values function elsewhere, so this
 # doesn't have to make the API call every time
 def export_data(
-    data_source: Optional[WorksheetData] = None,
+    data_source: WorksheetData | None = None,
     remove_header: bool = True,
-) -> Iterator[Union[Exception, Album]]:
+) -> Iterator[Exception | Album]:
     from .discogs_update import remove_image_formula
     from .core_gsheets import get_values
 
@@ -204,8 +205,8 @@ def export_data(
             genres,
             styles,
         ) = list(map(str.strip, map(str, vals)))
-        fscore: Optional[float] = None
-        note: Optional[str] = None
+        fscore: float | None = None
+        note: str | None = None
         try:
             fscore = float(score)
         except ValueError:
@@ -227,7 +228,7 @@ def export_data(
             yield e
             continue
 
-        listened_on: Optional[date] = None
+        listened_on: date | None = None
         if dateval:
             if fscore is None:
                 yield RuntimeError(
@@ -294,10 +295,10 @@ def dump_results(data: Any) -> str:
 # helper to read the dump back into list of python object
 def read_dump(p: Path) -> Iterator[Album]:
     for blob in json.loads(p.read_text()):
-        fscore: Optional[float] = None
+        fscore: float | None = None
         if blob["score"] is not None:
             fscore = float(blob["score"])
-        dlistened_on: Optional[date] = None
+        dlistened_on: date | None = None
         if blob["listened_on"] is not None:
             d = strptime(blob["listened_on"], r"%Y-%m-%d")
             dlistened_on = date(year=d.tm_year, month=d.tm_mon, day=d.tm_mday)

@@ -1,7 +1,8 @@
 import re
 import csv
 from pathlib import Path
-from typing import List, Set, Iterator, TextIO, Optional
+from typing import TextIO
+from collections.abc import Iterator
 
 
 from . import SETTINGS
@@ -10,7 +11,7 @@ from .core_gsheets import get_values
 from .export import Album, export_data
 
 
-def write_csv(name: str, results: WorksheetData, *, key: Optional[str] = None) -> None:
+def write_csv(name: str, results: WorksheetData, *, key: str | None = None) -> None:
     path = Path(SETTINGS.CSV_DATADIR)
     if key is not None:
         path /= key
@@ -26,8 +27,8 @@ def write_csv(name: str, results: WorksheetData, *, key: Optional[str] = None) -
             csv_writer.writerow(rrow)
 
 
-def _iter_descriptor(albums: List[Album], key: str) -> Set[str]:
-    descriptors: Set[str] = set()
+def _iter_descriptor(albums: list[Album], key: str) -> set[str]:
+    descriptors: set[str] = set()
     for a in albums:
         data = getattr(a, key)
         assert isinstance(data, list)
@@ -38,7 +39,7 @@ def _iter_descriptor(albums: List[Album], key: str) -> Set[str]:
 
 
 def _filter_by_descriptor(
-    values: List[WorksheetData], albums: List[Album], key: str, descriptor: str
+    values: list[WorksheetData], albums: list[Album], key: str, descriptor: str
 ) -> Iterator[WorksheetRow]:
     assert len(values) == len(albums)
     for v, a in zip(values, albums):
@@ -51,7 +52,7 @@ def _filter_by_descriptor(
 def update_datafiles() -> None:
     values = get_values(sheetRange="Music!A2:K", valueRenderOption="FORMULA")
     albums_exc = list(export_data(data_source=values, remove_header=False))
-    albums: List[Album] = []
+    albums: list[Album] = []
     for a in albums_exc:
         if isinstance(a, Exception):
             raise a

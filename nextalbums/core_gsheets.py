@@ -1,5 +1,5 @@
 import re
-from typing import Optional, Any
+from typing import Any
 
 import httplib2  # type: ignore[import]
 from googleapiclient import discovery  # type: ignore[import]
@@ -47,7 +47,7 @@ def get_values(
     *,
     sheetRange: str,
     valueRenderOption: str,
-    credentials: Optional[Any] = None,
+    credentials: Any | None = None,
     remove_escapes: bool = True,
 ) -> WorksheetData:
     creds: Any

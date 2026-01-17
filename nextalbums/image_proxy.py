@@ -4,7 +4,6 @@ import json
 import time
 import shutil
 import atexit
-from typing import cast
 from pathlib import Path
 from urllib.parse import urlparse
 from functools import cache
